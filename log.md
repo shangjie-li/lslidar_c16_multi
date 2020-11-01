@@ -4,8 +4,8 @@
    - 6008位于车身左侧，6009位于车身右侧，雷达尾部端子均朝上。
 ## 2020.11.01
  - 配置激光雷达IP
-   - 6008的IP：192.168.1.200，Data Port：2368，device Port：2369，对应的电脑静态IP：192.168.1.102
-   - 6009的IP：192.168.1.201，Data Port：2370，device Port：2371，对应的电脑静态IP：192.168.1.102
+   - 6008的IP：192.168.1.201，Data Port：2368，device Port：2369，对应的电脑静态IP：192.168.1.102
+   - 6009的IP：192.168.1.202，Data Port：2370，device Port：2371，对应的电脑静态IP：192.168.1.102
  - 连接激光雷达
    - 计算机的以太网口“Ethernet (enp2s0)”连接交换机“上联口”，交换机的任意2个“Poe端口”分别连接2个激光雷达的接线盒，建立以太网“LeiShen_switch”。
  - 修改`lslidar_c16_multi/lslidar_c16_decoder/launch/lslidar_c16.launch`
@@ -14,7 +14,7 @@
 
 	<group ns="ls_left">
 
-	  <arg name="device_ip" default="192.168.1.200" />
+	  <arg name="device_ip" default="192.168.1.201" />
 	  <arg name="msop_port" default="2368" />
 	  <arg name="difop_port" default="2369" />
 	  <arg name="return_mode" default="1" />
@@ -55,7 +55,7 @@
 
 	<group ns="ls_right">
 
-	  <arg name="device_ip" default="192.168.1.201" />
+	  <arg name="device_ip" default="192.168.1.202" />
 	  <arg name="msop_port" default="2370" />
 	  <arg name="difop_port" default="2371" />
 	  <arg name="return_mode" default="1" />
