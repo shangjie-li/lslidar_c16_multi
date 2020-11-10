@@ -1,26 +1,27 @@
-# 维护记录
-## 2020.10.31
- - 安装激光雷达
-   - 6008位于车身左侧，6009位于车身右侧，雷达尾部端子均朝上。
-## 2020.11.01
- - 配置激光雷达IP
-   - 6008的IP：192.168.1.201，Data Port：2368，device Port：2369，对应的电脑静态IP：192.168.1.102
-   - 6009的IP：192.168.1.202，Data Port：2370，device Port：2371，对应的电脑静态IP：192.168.1.102
- - 连接激光雷达
-   - 计算机的以太网口“Ethernet (enp2s0)”连接交换机“上联口”，交换机的任意2个“Poe端口”分别连接2个激光雷达的接线盒，建立以太网“LeiShen_switch”。
+# multi_lslidar_c16
+
+ROS driver for multiple lslidar_c16
+
+## 安装
+ - 建立工作空间并拷贝这个库
+   ```Shell
+   mkdir -p ros_ws/src
+   cd ros_ws/src
+   git clone https://github.com/shangjie-li/multi_lslidar_c16.git
+   cd ..
+   catkin_make
+   ```
+
+## 参数配置
  - 修改`lslidar_c16_multi/lslidar_c16_decoder/launch/lslidar_c16.launch`
    ```Shell
 	<launch>
-
 	<group ns="ls_left">
-
 	  <arg name="device_ip" default="192.168.1.201" />
 	  <arg name="msop_port" default="2368" />
 	  <arg name="difop_port" default="2369" />
 	  <arg name="return_mode" default="1" />
 	  <arg name="time_synchronization" default="true" />
-
-
 	  <node pkg="lslidar_c16_driver" type="lslidar_c16_driver_node" name="lslidar_c16_driver_node" output="screen">
 	    <param name="device_ip" value="$(arg device_ip)" />
 	    <param name="msop_port" value="$(arg msop_port)" />
@@ -32,7 +33,6 @@
 	    <param name="return_mode" value="$(arg return_mode)"/>
 	    <param name="time_synchronization" value="$(arg time_synchronization)"/>
 	  </node>
-
 	  <node pkg="lslidar_c16_decoder" type="lslidar_c16_decoder_node" name="lslidar_c16_decoder_node" output="screen">
 	    <param name="calibration_file" value="$(find lslidar_c16_decoder)/params/lslidar_c16_db.yaml" />
 	    <param name="min_range" value="0.15"/>
@@ -46,22 +46,15 @@
 	    <param name="time_synchronization" value="$(arg time_synchronization)"/>
 	    <param name="scan_start_angle" value="0.0"/>
 	    <param name="scan_end_angle" value="36000.0"/>
-
 	  </node>
-
 	</group>
-	 
-
 
 	<group ns="ls_right">
-
 	  <arg name="device_ip" default="192.168.1.202" />
 	  <arg name="msop_port" default="2370" />
 	  <arg name="difop_port" default="2371" />
 	  <arg name="return_mode" default="1" />
 	  <arg name="time_synchronization" default="true" />
-
-
 	  <node pkg="lslidar_c16_driver" type="lslidar_c16_driver_node" name="lslidar_c16_driver_node" output="screen">
 	    <param name="device_ip" value="$(arg device_ip)" />
 	    <param name="msop_port" value="$(arg msop_port)" />
@@ -73,7 +66,6 @@
 	    <param name="return_mode" value="$(arg return_mode)"/>
 	    <param name="time_synchronization" value="$(arg time_synchronization)"/>
 	  </node>
-
 	  <node pkg="lslidar_c16_decoder" type="lslidar_c16_decoder_node" name="lslidar_c16_decoder_node" output="screen">
 	    <param name="calibration_file" value="$(find lslidar_c16_decoder)/params/lslidar_c16_db.yaml" />
 	    <param name="min_range" value="0.15"/>
@@ -87,22 +79,24 @@
 	    <param name="time_synchronization" value="$(arg time_synchronization)"/>
 	    <param name="scan_start_angle" value="0.0"/>
 	    <param name="scan_end_angle" value="36000.0"/>
-
 	  </node>
-
 	</group>
-
 	</launch>
    ```
- - 启动
+## 运行
+ - 启动多个激光雷达
    ```Shell
-   source devel/setup.bash
    roslaunch lslidar_c16_decoder lslidar_c16.launch
    ```
- - 记录rosbag
-   `/home/seucat/ros_workspace/rosbag/2020-11-01/2020-11-01-16-03-12.bag`
 
-
-
+## 案例
+ - 机械安装
+    - 针对C16-121B-3120110001，安装在车身左侧，雷达尾部端子朝上。
+    - 针对C16-121B-3020060009，安装在车身右侧，雷达尾部端子朝上。
+ - 建立局域网
+    - 针对C16-121B-3120110001，IP：192.168.1.201，Data Port：2368，Device Port：2369，对应的电脑静态IP：192.168.1.102。
+    - 针对C16-121B-3020060009，IP：192.168.1.202，Data Port：2370，Device Port：2371，对应的电脑静态IP：192.168.1.102。
+ - 连接计算机和多个激光雷达
+    - 计算机的以太网口“Ethernet (enp2s0)”连接交换机“上联口”，交换机的任意2个“Poe端口”分别连接2个激光雷达的接线盒，建立以太网“LeiShen_switch”。
 
 
