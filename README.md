@@ -1,138 +1,108 @@
-# lslidar_c16
-#version v3.0.1_200619
+# 维护记录
+## 2020.10.31
+ - 安装激光雷达
+   - 6008位于车身左侧，6009位于车身右侧，雷达尾部端子均朝上。
+## 2020.11.01
+ - 配置激光雷达IP
+   - 6008的IP：192.168.1.201，Data Port：2368，device Port：2369，对应的电脑静态IP：192.168.1.102
+   - 6009的IP：192.168.1.202，Data Port：2370，device Port：2371，对应的电脑静态IP：192.168.1.102
+ - 连接激光雷达
+   - 计算机的以太网口“Ethernet (enp2s0)”连接交换机“上联口”，交换机的任意2个“Poe端口”分别连接2个激光雷达的接线盒，建立以太网“LeiShen_switch”。
+ - 修改`lslidar_c16_multi/lslidar_c16_decoder/launch/lslidar_c16.launch`
+   ```Shell
+	<launch>
 
-## version track
-Author: zx
-### ver3.0 zx
+	<group ns="ls_left">
 
-## Description
-The `lslidar_c16` package is a linux ROS driver for lslidar c16.
-The package is tested on Ubuntu 16.04 with ROS kinetic.
-
-## Compling
-This is a Catkin package. Make sure the package is on `ROS_PACKAGE_PATH` after cloning the package to your workspace. And the normal procedure for compling a catkin package will work.
-
-```
-cd your_work_space
-catkin_make 
-```
-
-## Example Usage
-
-### lslidar_c16_decoder
-
-**Parameters**
-
-`lidar_ip` (`string`, `default: 192.168.1.200`)
-
-By default, the IP address of the device is 192.168.1.200.
-
-`frame_id` (`string`, `default: laser_link`)
-
-The frame ID entry for the sent messages.
-
-**Published Topics**
-
-`lslidar_point_cloud`
-
-Each message corresponds to a lslidar packet sent by the device through the Ethernet.
-
-### lslidar_c16_decoder
-
-**Parameters**
-
-`min_range` (`double`, `0.3`)
-
-`max_range` (`double`, `200.0`)
-
-Points outside this range will be removed.
-
-`frequency` (`frequency`, `10.0`)
-
-Note that the driver does not change the frequency of the sensor. 
-
-`publish_point_cloud` (`bool`, `true`)
-
-If set to true, the decoder will additionally send out a local point cloud consisting of the points in each revolution.
-
-**Published Topics**
-
-`lslidar_sweep` (`lslidar_c16_msgs/LslidarChSweep`)
-
-The message arranges the points within each sweep based on its scan index and azimuth.
-
-`lslidar_point_cloud` (`sensor_msgs/PointCloud2`)
-
-This is only published when the `publish_point_cloud` is set to `true` in the launch file.
-
-**Node**
-
-```
-roslaunch lslidar_c16_decoder lslidar_c16.launch --screen
-```
-Note that this launch file launches both the driver and the decoder, which is the only launch file needed to be used.
+	  <arg name="device_ip" default="192.168.1.201" />
+	  <arg name="msop_port" default="2368" />
+	  <arg name="difop_port" default="2369" />
+	  <arg name="return_mode" default="1" />
+	  <arg name="time_synchronization" default="true" />
 
 
-## FAQ
+	  <node pkg="lslidar_c16_driver" type="lslidar_c16_driver_node" name="lslidar_c16_driver_node" output="screen">
+	    <param name="device_ip" value="$(arg device_ip)" />
+	    <param name="msop_port" value="$(arg msop_port)" />
+	    <param name="difop_port" value="$(arg difop_port)"/>
+	    <param name="frame_id" value="laser_link_left"/>
+	    <param name="add_multicast" value="false"/>
+	    <param name="group_ip" value="224.1.1.1"/>
+	    <param name="rpm" value="600"/>
+	    <param name="return_mode" value="$(arg return_mode)"/>
+	    <param name="time_synchronization" value="$(arg time_synchronization)"/>
+	  </node>
+
+	  <node pkg="lslidar_c16_decoder" type="lslidar_c16_decoder_node" name="lslidar_c16_decoder_node" output="screen">
+	    <param name="calibration_file" value="$(find lslidar_c16_decoder)/params/lslidar_c16_db.yaml" />
+	    <param name="min_range" value="0.15"/>
+	    <param name="max_range" value="150.0"/>
+	    <param name="cbMethod" value="true"/>
+	    <param name="config_vert" value="true"/>
+	    <param name="print_vert" value="false"/>
+	    <param name="return_mode" value="$(arg return_mode)"/>
+	    <param name="config_vert_file" value="false"/>
+	    <param name="distance_unit" value="0.25"/>
+	    <param name="time_synchronization" value="$(arg time_synchronization)"/>
+	    <param name="scan_start_angle" value="0.0"/>
+	    <param name="scan_end_angle" value="36000.0"/>
+
+	  </node>
+
+	</group>
+	 
 
 
-## Bug Report
+	<group ns="ls_right">
+
+	  <arg name="device_ip" default="192.168.1.202" />
+	  <arg name="msop_port" default="2370" />
+	  <arg name="difop_port" default="2371" />
+	  <arg name="return_mode" default="1" />
+	  <arg name="time_synchronization" default="true" />
 
 
-##Version changes
-/***********2020-01-03****************/
-Original version : lslidar_c16_v2.02_190919
-Revised version  : lslidar_c16_v2.03_200103
-Modify  		 : Add a new calibration decode for the new lslidar c16
-Author			 : zx
-Date			 : 2020-01-03
+	  <node pkg="lslidar_c16_driver" type="lslidar_c16_driver_node" name="lslidar_c16_driver_node" output="screen">
+	    <param name="device_ip" value="$(arg device_ip)" />
+	    <param name="msop_port" value="$(arg msop_port)" />
+	    <param name="difop_port" value="$(arg difop_port)"/>
+	    <param name="frame_id" value="laser_link_right"/>
+	    <param name="add_multicast" value="false"/>
+	    <param name="group_ip" value="224.1.1.1"/>
+	    <param name="rpm" value="600"/>
+	    <param name="return_mode" value="$(arg return_mode)"/>
+	    <param name="time_synchronization" value="$(arg time_synchronization)"/>
+	  </node>
 
+	  <node pkg="lslidar_c16_decoder" type="lslidar_c16_decoder_node" name="lslidar_c16_decoder_node" output="screen">
+	    <param name="calibration_file" value="$(find lslidar_c16_decoder)/params/lslidar_c16_db.yaml" />
+	    <param name="min_range" value="0.15"/>
+	    <param name="max_range" value="150.0"/>
+	    <param name="cbMethod" value="true"/>
+	    <param name="config_vert" value="true"/>
+	    <param name="print_vert" value="false"/>
+	    <param name="return_mode" value="$(arg return_mode)"/>
+	    <param name="config_vert_file" value="false"/>
+	    <param name="distance_unit" value="0.25"/>
+	    <param name="time_synchronization" value="$(arg time_synchronization)"/>
+	    <param name="scan_start_angle" value="0.0"/>
+	    <param name="scan_end_angle" value="36000.0"/>
 
-/***********2020-01-16****************/
-Original version : lslidar_c16_v2.03_200103
-Revised version  : lslidar_c16_v2.6.0_200116
-Modify  		 : Adds the vertical Angle correction file lslidar_c16_db.yaml for the RoS program code
-				   Change the range resolution to 0.25cm according to the v2.6 protocol
-Author			 : zx
-Date			 : 2020-01-16
+	  </node>
 
-/***********2020-04-02****************/
-Original version : lslidar_c16_v2.6.0_200116
-Revised version  : lslidar_c16_v2.6.1_200402
-Modify  		 : 1. 增加了读取设备包并解析垂直角度值的功能，用于替换原有固定的垂直角度值。
-		           2. 修改了lslidar_c16.launch文件，用于兼容选择参数和功能
-Author			 : zx
-Date			 : 2020-04-02
+	</group>
 
-luanch文件说明: 
-  <node pkg="lslidar_c16_decoder" type="lslidar_c16_decoder_node" name="lslidar_c16_decoder_node" output="screen">
-    <param name="calibration_file" value="$(find lslidar_c16_decoder)/params/lslidar_c16_db.yaml" />
-    <param name="min_range" value="0.15"/>
-    <param name="max_range" value="150.0"/>
-    <param name="cbMethod" value="true"/>		//cbMethod = true表示增加x,y坐标的偏移计算补偿, false则不加
-    <param name="print_vert" value="true"/>		//print_vert = true 表示打印设备包角度信息， false表示关闭打印信息
-    <param name="config_vert_file" value="false"/>	//config_vert_file = true 表示读取yaml文件中的垂直角度， false则关闭
-    <param name="distance_unit" value="0.25"/>		//distance_unit = 0.25表示距离单位为0.25cm, = 1表示距离单位为1cm
-    <param name="time_synchronization" value="$(arg time_synchronization)"/>
-  </node>
-
-/***********2020-06-06************/
-Original version : lslidar_c16_v2.6.1_200402
-Revised version  : lslidar_c16_v3.0_200606
-Modify  		 : 1. 修改了读取设备包并解析垂直角度值和GPS时间的功能。
-
-​	                      2. 增加了读取设备包并解析3号版版本号，用于兼容V2.0版本雷达。
-
-Author			 : lqm
-Date			 : 2020-06-06
+	</launch>
+   ```
+ - 启动
+   ```Shell
+   source devel/setup.bash
+   roslaunch lslidar_c16_decoder lslidar_c16.launch
+   ```
+ - 记录rosbag
+   `/home/seucat/ros_workspace/rosbag/2020-11-01/2020-11-01-16-03-12.bag`
 
 
 
-/***********2020-06-19************/
-Original version :  lslidar_c16_v3.0_200606
-Revised version  : lslidar_c16_v3.0.1_200619
-Modify  		 : 1. 点云校准距离计算方式更新。
 
-Author			 : lqm
-Date			 : 2020-06-19
 
