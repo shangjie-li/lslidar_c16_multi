@@ -84,7 +84,7 @@ ROS driver for multiple lslidar_c16
 	</launch>
    ```
 ## 运行
- - 启动多个激光雷达
+ - 启动`multi_lslidar_c16`
    ```Shell
    roslaunch lslidar_c16_decoder lslidar_c16.launch
    ```
